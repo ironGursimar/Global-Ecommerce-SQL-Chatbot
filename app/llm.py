@@ -38,7 +38,7 @@ second_value: string or null
 Semantics:
 - "total spend" / "money spent" => metric spend, aggregation sum.
 - "average order value" => aov, aggregation avg.
-- "how many transactions/orders" => transactions, count.
+- "purchases", "orders", "sales", or "how many transactions" => transactions, count. These mean completed transaction count, not target rate.
 - "how many customers" => customers, count_distinct.
 - "sessions/visits" => sessions, count.
 - "average session duration" => session_duration, avg.
@@ -46,7 +46,7 @@ Semantics:
 - "bounce rate" => bounce_rate, avg.
 - "average income" => income, avg.
 - "campaign budget" => campaign_budget, sum or avg depending wording.
-- "purchase target rate" => target_rate, avg.
+- "purchase target rate", "purchase probability", or "conversion target" => target_rate, avg. Do not use target_rate for the word "purchases" alone.
 - "top/highest/most" => ranking + desc.
 - "lowest/bottom" => ranking + asc.
 - "by country/region/tier/..." => dimension accordingly.
@@ -82,16 +82,16 @@ def rule_fallback(q: str) -> dict[str, Any]:
     elif any(x in s for x in ['how many','count','number of']): out['intent']='count'; out['aggregation']='count'
     elif 'trend' in s or 'over time' in s or 'by month' in s: out['intent']='trend'; out['dimension']='date'
     else: out['intent']='average'; out['aggregation']='avg'
-    if 'spend' in s or 'spent' in s: out['metric']='spend'; out['aggregation']='sum' if out['intent']=='ranking' else 'avg'
+    if any(x in s for x in ['spend', 'spent', 'revenue', 'sales value']): out['metric']='spend'; out['aggregation']='sum' if out['intent']=='ranking' else 'avg'
     elif 'aov' in s or 'average order value' in s or 'order value' in s: out['metric']='aov'; out['aggregation']='avg'
-    elif 'transaction' in s or 'order' in s: out['metric']='transactions'; out['aggregation']='count'
+    elif any(x in s for x in ['transaction', 'transactions', 'purchase', 'purchases', 'order', 'orders']): out['metric']='transactions'; out['aggregation']='count'
     elif 'session duration' in s: out['metric']='session_duration'; out['aggregation']='avg'
     elif 'session' in s: out['metric']='sessions'; out['aggregation']='count'
     elif 'bounce' in s: out['metric']='bounce_rate'; out['aggregation']='avg'
     elif 'discount' in s: out['metric']='discount_rate'; out['aggregation']='avg'
     elif 'income' in s: out['metric']='income'; out['aggregation']='avg'
     elif 'budget' in s: out['metric']='campaign_budget'; out['aggregation']='sum'
-    elif 'target' in s or 'purchase' in s: out['metric']='target_rate'; out['aggregation']='avg'
+    elif any(x in s for x in ['target rate', 'purchase probability', 'conversion target']): out['metric']='target_rate'; out['aggregation']='avg'
     if 'country' in s: out['dimension']='country'
     elif 'region tier' in s: out['dimension']='region_tier'
     elif 'region' in s: out['dimension']='region'
