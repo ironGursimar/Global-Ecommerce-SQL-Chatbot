@@ -93,5 +93,5 @@ def format_answer(q,spec,rows):
     lines.extend(f'| {i} | {display_dimension(r["dimension"])} | {format_value(r["value"], spec)} |' for i, r in enumerate(rows, 1))
     if len(rows) > 1 and float(rows[1]['value'] or 0):
         ratio = float(first['value']) / float(rows[1]['value'])
-        lines.extend(['', f'{display_dimension(first["dimension"])} is approximately **{ratio:.1f}×** the second-ranked result.'])
+        lines.extend(['', f'{display_dimension(first["dimension"])} is approximately **{ratio:.1f}x** the second-ranked result.'])
     return '\n'.join(lines)
